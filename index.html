@@ -1,0 +1,435 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аудит сервісів Back Office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;600;700&family=Golos+Text:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF1EE;
+    --card:#FFFFFF;
+    --ink:#1A1C1A;
+    --muted:#6B716C;
+    --line:#E0E2DD;
+    --value:#2E7D6B;      /* вісь "Користь" */
+    --value-tint:#E6F1ED;
+    --burden:#B5672A;     /* вісь "Важкість" */
+    --burden-tint:#F6ECE0;
+    --ring:#1A1C1A;
+    --display:"Geologica",system-ui,sans-serif;
+    --body:"Golos Text",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    font-size:16px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    padding:32px 18px 80px;
+  }
+  .wrap{max-width:640px;margin:0 auto}
+
+  /* ---- header ---- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--display);
+    font-weight:700;
+    font-size:clamp(28px,6vw,40px);
+    line-height:1.02;
+    letter-spacing:-.01em;
+    margin:0 0 10px;
+  }
+  .sub{color:var(--muted);font-size:15px;margin:0 0 22px;max-width:46ch}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .note{
+    border-left:3px solid var(--burden);
+    background:var(--burden-tint);
+    padding:12px 14px;
+    border-radius:0 8px 8px 0;
+    font-size:13.5px;
+    color:#5A3C1E;
+    margin:0 0 26px;
+  }
+  .note b{color:#3F2A14}
+
+  .team{margin:0 0 30px}
+  .team label{
+    display:block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:0 0 8px;
+  }
+  select{
+    width:100%;
+    font-family:var(--body);
+    font-size:16px;
+    color:var(--ink);
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:13px 14px;
+    appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%236B716C' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 14px center;
+  }
+  select:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+  .team input[type="text"]{
+    width:100%;font-family:var(--body);font-size:16px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:13px 14px;
+  }
+  .team input[type="text"]:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+  .team + .team{margin-top:-14px}
+
+  /* ---- service card ---- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 18px;
+    margin:0 0 16px;
+    transition:opacity .18s,filter .18s;
+  }
+  .card.skipped{opacity:.5;filter:grayscale(.4)}
+  .card .name{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:19px;
+    line-height:1.15;
+    margin:0 0 4px;
+  }
+  .card .desc{color:var(--muted);font-size:13.5px;margin:0 0 18px}
+  .card .owner{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);border:1px solid var(--line);
+    border-radius:5px;padding:3px 7px;margin:0 0 10px;
+  }
+
+  .scale{margin:0 0 16px}
+  .scale--value{--accent:var(--value);--accent-tint:var(--value-tint)}
+  .scale--burden{--accent:var(--burden);--accent-tint:var(--burden-tint)}
+  .scale .legend{
+    display:flex;align-items:baseline;gap:8px;
+    margin:0 0 9px;
+  }
+  .scale .tag{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--accent);
+    padding:3px 7px;
+    border-radius:5px;
+  }
+  .scale .q{font-size:13.5px;color:var(--ink)}
+
+  .opts{display:flex;gap:7px}
+  .opt{flex:1;position:relative}
+  .opt input{position:absolute;opacity:0;width:0;height:0}
+  .opt label{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:3px;
+    min-height:56px;
+    padding:8px 2px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+    text-align:center;
+    transition:background .12s,border-color .12s,color .12s;
+  }
+  .opt .num{font-family:var(--mono);font-weight:700;font-size:16px;line-height:1}
+  .opt .anchor{font-size:10.5px;color:var(--muted);line-height:1.1}
+  .opt label:hover{background:var(--accent-tint);border-color:var(--accent)}
+  .opt:has(input:checked) label{
+    background:var(--accent);border-color:var(--accent);color:#fff;
+  }
+  .opt:has(input:checked) label .anchor{color:rgba(255,255,255,.85)}
+  .opt:has(input:focus-visible) label{outline:2px solid var(--ring);outline-offset:2px}
+  .opt input:disabled+label{cursor:not-allowed}
+
+  .na{
+    display:inline-flex;align-items:center;gap:8px;
+    margin-top:4px;font-size:13px;color:var(--muted);cursor:pointer;
+    user-select:none;
+  }
+  .na input{width:16px;height:16px;accent-color:var(--ink);cursor:pointer}
+
+  /* ---- comment + submit ---- */
+  .comment{margin:30px 0 26px}
+  .comment label{
+    display:block;font-family:var(--display);font-weight:600;font-size:17px;margin:0 0 4px;
+  }
+  .comment .hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+  textarea{
+    width:100%;min-height:96px;resize:vertical;
+    font-family:var(--body);font-size:15px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;line-height:1.5;
+  }
+  textarea:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+
+  .err{
+    display:none;
+    background:#FBE9E7;border:1px solid #E4B3AC;color:#7A2E20;
+    border-radius:10px;padding:12px 14px;font-size:13.5px;margin:0 0 16px;
+  }
+  .err.show{display:block}
+
+  .submit{
+    width:100%;
+    font-family:var(--display);font-weight:600;font-size:16px;
+    color:#fff;background:var(--ink);
+    border:none;border-radius:12px;padding:16px;cursor:pointer;
+    transition:transform .08s,opacity .15s;
+  }
+  .submit:hover{opacity:.9}
+  .submit:active{transform:translateY(1px)}
+  .submit:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+
+  /* ---- summary ---- */
+  .summary{display:none}
+  .summary.show{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .summary h2{font-family:var(--display);font-weight:700;font-size:26px;margin:0 0 6px}
+  .summary .meta{color:var(--muted);font-size:14px;margin:0 0 20px}
+  .row{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:13px 0;border-bottom:1px solid var(--line);
+  }
+  .row .rn{font-size:15px;font-weight:500;flex:1;min-width:0}
+  .row .scores{display:flex;gap:8px;flex-shrink:0}
+  .pill{
+    font-family:var(--mono);font-size:12px;font-weight:700;
+    padding:4px 9px;border-radius:6px;color:#fff;white-space:nowrap;
+  }
+  .pill.v{background:var(--value)}
+  .pill.b{background:var(--burden)}
+  .pill.skip{background:#9AA09B}
+  .comment-out{margin:18px 0;font-size:14px;color:var(--ink)}
+  .comment-out .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin:0 0 5px}
+  pre{
+    background:#1A1C1A;color:#E8EBE6;border-radius:10px;
+    padding:14px;font-family:var(--mono);font-size:12px;line-height:1.5;
+    overflow:auto;margin:18px 0 12px;
+  }
+  .copy{
+    font-family:var(--body);font-size:14px;color:var(--ink);
+    background:none;border:1px solid var(--line);border-radius:9px;
+    padding:9px 14px;cursor:pointer;
+  }
+  .copy:hover{background:var(--card)}
+  .draftnote{margin-top:18px;font-size:12.5px;color:var(--muted)}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <form id="form">
+    <p class="eyebrow">Quarks · Back Office</p>
+    <h1>Аудит сервісів очима команд</h1>
+    <p class="sub">Оціни кожен сервіс за двома шкалами: <b>наскільки він корисний</b> і <b>скільки сил забирає</b>. Близько 5 хвилин.</p>
+
+    <div class="note">
+      <b>«Важкість»</b> — це скільки сил і часу витрачає <b>твоя команда</b>, щоб отримати результат. Не про те, наскільки складний процес усередині Back Office.
+    </div>
+
+    <div class="team">
+      <label for="unit">Твій юніт</label>
+      <select id="unit" required>
+        <option value="" disabled selected>— обери —</option>
+        <option>Social Discovery</option>
+        <option>Affemity Group</option>
+        <option>Soportio</option>
+        <option>Internal PaaS (Bezuskyi)</option>
+        <option>Internal PaaS (Ozimok)</option>
+      </select>
+    </div>
+
+    <div class="team">
+      <label for="team">Твоя команда</label>
+      <!-- TODO: cascading mapping юніт → команда зробимо пізніше -->
+      <input id="team" type="text" placeholder="Назва твоєї команди" required>
+    </div>
+
+    <div id="services"></div>
+
+    <div class="comment">
+      <label for="open">Що найбільше бісить — і чому? Чого бракує?</label>
+      <p class="hint">Необов'язково. Сюди — те, що не вліземо в цифри.</p>
+      <textarea id="open" placeholder="Напиши вільно…"></textarea>
+    </div>
+
+    <div class="err" id="err"></div>
+    <button type="submit" class="submit">Готово</button>
+  </form>
+
+  <div class="summary" id="summary">
+    <h2>Підсумок</h2>
+    <p class="meta" id="sumMeta"></p>
+    <div id="sumRows"></div>
+    <div class="comment-out" id="sumComment" style="display:none">
+      <span class="lbl">Коментар</span>
+      <span id="sumCommentText"></span>
+    </div>
+    <pre id="json"></pre>
+    <button class="copy" id="copyBtn" type="button">Скопіювати дані</button>
+    <p class="draftnote">Це попередній перегляд. Реальний збір відповідей під'єднаємо окремо (Google Sheets / Forms — рішення ще відкрите).</p>
+  </div>
+
+</div>
+
+<script>
+/* ====== Сервіси для оцінки. Наповнювати = дописати об'єкти. ====== */
+const SERVICES = [
+  { id:"hire",        name:"Найм людини в команду",            desc:"Від брифу на вакансію до виходу кандидата",                  owner:"Talent Acquisition" },
+  { id:"device",      name:"Техніка та робоче місце",          desc:"Видача, налаштування, ремонт ноутбуків і периферії",          owner:"Operations" },
+  { id:"access",      name:"Доступи, акаунти, підписки",        desc:"Видача й закриття доступів до сервісів і софту",              owner:"Operations" },
+  { id:"performance", name:"Performance review",               desc:"Підготовка й супровід циклу оцінки результативності",         owner:"HR" },
+  { id:"adhoc",       name:"Разовий крос-функційний запит",     desc:"Нестандартна задача, що не лягає в жоден стандартний процес",  owner:"Operations" },
+];
+
+const VALUE_Q  = "Наскільки сервіс корисний для цілей твоєї команди?";
+const VALUE_A  = ["не впливає","трохи","помітно","критично"];
+const BURDEN_Q = "Скільки зусиль і часу команда витрачає, щоб отримати результат?";
+const BURDEN_A = ["легко","дрібниці","напряжно","боляче"];
+
+/* ---- render ---- */
+const scaleHTML = (sid, axis, q, anchors, tag) => {
+  const cls  = axis === "value" ? "scale--value" : "scale--burden";
+  const name = axis === "value" ? `val-${sid}` : `bur-${sid}`;
+  const opts = anchors.map((a,i)=>{
+    const n = i+1;
+    return `<div class="opt">
+      <input type="radio" id="${name}-${n}" name="${name}" value="${n}">
+      <label for="${name}-${n}"><span class="num">${n}</span><span class="anchor">${a}</span></label>
+    </div>`;
+  }).join("");
+  return `<div class="scale ${cls}" data-axis="${axis}">
+    <div class="legend"><span class="tag">${tag}</span><span class="q">${q}</span></div>
+    <div class="opts">${opts}</div>
+  </div>`;
+};
+
+document.getElementById("services").innerHTML = SERVICES.map(s => `
+  <div class="card" data-sid="${s.id}">
+    <span class="owner">${s.owner}</span>
+    <p class="name">${s.name}</p>
+    <p class="desc">${s.desc}</p>
+    ${scaleHTML(s.id,"value", VALUE_Q,  VALUE_A,  "Користь")}
+    ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
+    <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим сервісом</label>
+  </div>
+`).join("");
+
+/* ---- "не користуюсь" toggling ---- */
+SERVICES.forEach(s => {
+  const na = document.getElementById(`na-${s.id}`);
+  const card = document.querySelector(`.card[data-sid="${s.id}"]`);
+  na.addEventListener("change", () => {
+    card.classList.toggle("skipped", na.checked);
+    card.querySelectorAll('input[type="radio"]').forEach(r => {
+      r.disabled = na.checked;
+      if (na.checked) r.checked = false;
+    });
+  });
+});
+
+/* ---- submit ---- */
+const form = document.getElementById("form");
+const err  = document.getElementById("err");
+
+const getVal = (sid, axis) => {
+  const name = axis === "value" ? `val-${sid}` : `bur-${sid}`;
+  const c = document.querySelector(`input[name="${name}"]:checked`);
+  return c ? Number(c.value) : null;
+};
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  err.classList.remove("show");
+
+  const unit = document.getElementById("unit").value;
+  const team = document.getElementById("team").value.trim();
+  const missing = [];
+  const answers = SERVICES.map(s => {
+    const na = document.getElementById(`na-${s.id}`).checked;
+    if (na) return { id:s.id, name:s.name, owner:s.owner, na:true };
+    const value = getVal(s.id,"value");
+    const burden = getVal(s.id,"burden");
+    if (value === null || burden === null) missing.push(s.name);
+    return { id:s.id, name:s.name, owner:s.owner, value, burden };
+  });
+
+  if (!unit) { showErr("Спочатку обери юніт."); return; }
+  if (!team) { showErr("Впиши свою команду."); return; }
+  if (missing.length) {
+    showErr("Залиш обидві оцінки або познач «не користуюсь» для: " + missing.join(", ") + ".");
+    return;
+  }
+
+  renderSummary(unit, team, answers, document.getElementById("open").value.trim());
+});
+
+function showErr(msg){
+  err.textContent = msg;
+  err.classList.add("show");
+  err.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+/* ---- summary ---- */
+function renderSummary(unit, team, answers, comment){
+  const payload = { unit, team, answers, comment, ts:new Date().toISOString() };
+
+  document.getElementById("sumMeta").textContent = "Юніт: " + unit + " · Команда: " + team;
+
+  document.getElementById("sumRows").innerHTML = answers.map(a => {
+    const scores = a.na
+      ? `<span class="pill skip">не користується</span>`
+      : `<span class="pill v">користь ${a.value}</span><span class="pill b">важкість ${a.burden}</span>`;
+    return `<div class="row"><span class="rn">${a.name}</span><span class="scores">${scores}</span></div>`;
+  }).join("");
+
+  const ce = document.getElementById("sumComment");
+  if (comment){
+    document.getElementById("sumCommentText").textContent = comment;
+    ce.style.display = "block";
+  } else { ce.style.display = "none"; }
+
+  document.getElementById("json").textContent = JSON.stringify(payload, null, 2);
+
+  form.style.display = "none";
+  const sum = document.getElementById("summary");
+  sum.classList.add("show");
+  sum.scrollIntoView({behavior:"smooth", block:"start"});
+
+  document.getElementById("copyBtn").onclick = () => {
+    navigator.clipboard.writeText(JSON.stringify(payload))
+      .then(()=> { const b=document.getElementById("copyBtn"); b.textContent="Скопійовано ✓"; setTimeout(()=>b.textContent="Скопіювати дані",1800); });
+  };
+}
+</script>
+</body>
+</html>
