@@ -67,6 +67,24 @@
   }
   .note b{color:#3F2A14}
 
+  .scaleinfo{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 16px 14px;
+    margin:0 0 22px;
+  }
+  .scaleinfo .si-row{margin:0 0 4px;font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .scaleinfo .si-scale{margin:0 0 14px;font-size:13px;color:var(--muted);padding-left:2px}
+  .scaleinfo .si-scale:last-child{margin-bottom:0}
+  .scaleinfo .si-scale b{color:var(--ink);font-family:var(--mono);font-size:12px}
+  .scaleinfo .si-tag{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:#fff;padding:3px 7px;border-radius:5px;flex-shrink:0;
+  }
+  .scaleinfo .si-v{background:var(--value)}
+  .scaleinfo .si-b{background:var(--burden)}
+
   .team{margin:0 0 30px}
   .team label{
     display:block;
@@ -257,6 +275,16 @@
     </div>
 
     <div class="team">
+      <label for="role">Ти</label>
+      <select id="role" required>
+        <option value="" disabled selected>— обери —</option>
+        <option>C-level</option>
+        <option>Manager</option>
+        <option>Individual Contributor</option>
+      </select>
+    </div>
+
+    <div class="team">
       <label for="unit">Твій юніт</label>
       <select id="unit" required>
         <option value="" disabled selected>— обери —</option>
@@ -272,6 +300,13 @@
       <label for="team">Твоя команда</label>
       <!-- TODO: cascading mapping юніт → команда зробимо пізніше -->
       <input id="team" type="text" placeholder="Назва твоєї команди" required>
+    </div>
+
+    <div class="scaleinfo">
+      <p class="si-row"><span class="si-tag si-v">Користь</span> наскільки сервіс допомагає твоїй команді</p>
+      <p class="si-scale"><b>1</b> не впливає · <b>2</b> трохи допомагає · <b>3</b> помітно допомагає · <b>4</b> критично, без нього важко</p>
+      <p class="si-row"><span class="si-tag si-b">Важкість</span> скільки сил і часу забирає отримати результат</p>
+      <p class="si-scale"><b>1</b> легко, майже само · <b>2</b> дрібні затримки · <b>3</b> відчутно напряжно · <b>4</b> багато болю й пінг-понгу</p>
     </div>
 
     <div id="services"></div>
@@ -371,6 +406,7 @@ form.addEventListener("submit", e => {
   e.preventDefault();
   err.classList.remove("show");
 
+  const role = document.getElementById("role").value;
   const unit = document.getElementById("unit").value;
   const team = document.getElementById("team").value.trim();
   const missing = [];
@@ -383,14 +419,15 @@ form.addEventListener("submit", e => {
     return { id:s.id, name:s.name, owner:s.owner, value, burden };
   });
 
-  if (!unit) { showErr("Спочатку обери юніт."); return; }
+  if (!role) { showErr("Спочатку обери, хто ти."); return; }
+  if (!unit) { showErr("Обери юніт."); return; }
   if (!team) { showErr("Впиши свою команду."); return; }
   if (missing.length) {
     showErr("Залиш обидві оцінки або познач «не користуюсь» для: " + missing.join(", ") + ".");
     return;
   }
 
-  renderSummary(unit, team, answers, document.getElementById("open").value.trim());
+  renderSummary(role, unit, team, answers, document.getElementById("open").value.trim());
 });
 
 function showErr(msg){
@@ -400,10 +437,10 @@ function showErr(msg){
 }
 
 /* ---- summary ---- */
-function renderSummary(unit, team, answers, comment){
-  const payload = { unit, team, answers, comment, ts:new Date().toISOString() };
+function renderSummary(role, unit, team, answers, comment){
+  const payload = { role, unit, team, answers, comment, ts:new Date().toISOString() };
 
-  document.getElementById("sumMeta").textContent = "Юніт: " + unit + " · Команда: " + team;
+  document.getElementById("sumMeta").textContent = role + " · " + unit + " · " + team;
 
   document.getElementById("sumRows").innerHTML = answers.map(a => {
     const scores = a.na
