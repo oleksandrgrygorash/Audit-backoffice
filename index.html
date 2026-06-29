@@ -263,7 +263,9 @@
     padding:9px 14px;cursor:pointer;
   }
   .copy:hover{background:var(--card)}
-  .draftnote{margin-top:18px;font-size:12.5px;color:var(--muted)}
+  .savestatus{margin-top:18px;font-size:13px}
+  .savestatus.ok{color:var(--value)}
+  .savestatus.fail{color:var(--burden)}
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
@@ -339,12 +341,15 @@
     </div>
     <pre id="json"></pre>
     <button class="copy" id="copyBtn" type="button">Скопіювати дані</button>
-    <p class="draftnote">Це попередній перегляд. Реальний збір відповідей під'єднаємо окремо (Google Sheets / Forms — рішення ще відкрите).</p>
+    <p class="savestatus" id="saveStatus"></p>
   </div>
 
 </div>
 
 <script>
+/* ====== Куди шлемо відповіді (Apps Script Web App) ====== */
+const ENDPOINT = "https://script.google.com/a/macros/quarks.tech/s/AKfycbyXyo6VD5k5elaDuJa08Qwlh7PLuo4q2gCyD2Gib9ZZDIK2RxEMQiy-1Jr449pjag4/exec";
+
 /* ====== Сервіси для оцінки. Наповнювати = дописати об'єкти. ====== */
 const SERVICES = [
   // Talent Acquisition
@@ -468,7 +473,9 @@ function showErr(msg){
 
 /* ---- summary ---- */
 function renderSummary(role, unit, team, answers, comment){
-  const payload = { role, unit, team, answers, comment, ts:new Date().toISOString() };
+  const submission_id = new Date().toISOString().replace(/[-:.TZ]/g,"").slice(0,15)
+    + "-" + Math.random().toString(36).slice(2,6);
+  const payload = { submission_id, role, unit, team, answers, comment, ts:new Date().toISOString() };
 
   document.getElementById("sumMeta").textContent = role + " · " + unit + " · " + team;
 
@@ -496,6 +503,20 @@ function renderSummary(role, unit, team, answers, comment){
     navigator.clipboard.writeText(JSON.stringify(payload))
       .then(()=> { const b=document.getElementById("copyBtn"); b.textContent="Скопійовано ✓"; setTimeout(()=>b.textContent="Скопіювати дані",1800); });
   };
+
+  const status = document.getElementById("saveStatus");
+  status.textContent = "Зберігаю…";
+  status.className = "savestatus";
+  fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  })
+  .then(()=> { status.textContent = "Збережено ✓"; status.className = "savestatus ok"; })
+  .catch(()=> {
+    status.textContent = "Не вдалось зберегти автоматично — натисни «Скопіювати дані» й надішли вручну.";
+    status.className = "savestatus fail";
+  });
 }
 </script>
 </body>
