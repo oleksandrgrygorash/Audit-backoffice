@@ -117,6 +117,19 @@
   .team input[type="text"]:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
   .team + .team{margin-top:-14px}
 
+  /* ---- group heading ---- */
+  .group{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin:26px 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px solid var(--line);
+  }
+  .group:first-child{margin-top:0}
+
   /* ---- service card ---- */
   .card{
     background:var(--card);
@@ -135,11 +148,6 @@
     margin:0 0 4px;
   }
   .card .desc{color:var(--muted);font-size:13.5px;margin:0 0 18px}
-  .card .owner{
-    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
-    text-transform:uppercase;color:var(--muted);border:1px solid var(--line);
-    border-radius:5px;padding:3px 7px;margin:0 0 10px;
-  }
 
   .scale{margin:0 0 16px}
   .scale--value{--accent:var(--value);--accent-tint:var(--value-tint)}
@@ -255,7 +263,9 @@
     padding:9px 14px;cursor:pointer;
   }
   .copy:hover{background:var(--card)}
-  .draftnote{margin-top:18px;font-size:12.5px;color:var(--muted)}
+  .savestatus{margin-top:18px;font-size:13px}
+  .savestatus.ok{color:var(--value)}
+  .savestatus.fail{color:var(--burden)}
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
@@ -331,19 +341,35 @@
     </div>
     <pre id="json"></pre>
     <button class="copy" id="copyBtn" type="button">Скопіювати дані</button>
-    <p class="draftnote">Це попередній перегляд. Реальний збір відповідей під'єднаємо окремо (Google Sheets / Forms — рішення ще відкрите).</p>
+    <p class="savestatus" id="saveStatus"></p>
   </div>
 
 </div>
 
 <script>
+/* ====== Куди шлемо відповіді (Apps Script Web App) ====== */
+const ENDPOINT = "https://script.google.com/a/macros/quarks.tech/s/AKfycbyXyo6VD5k5elaDuJa08Qwlh7PLuo4q2gCyD2Gib9ZZDIK2RxEMQiy-1Jr449pjag4/exec";
+
 /* ====== Сервіси для оцінки. Наповнювати = дописати об'єкти. ====== */
 const SERVICES = [
-  { id:"hire",        name:"Найм людини в команду",            desc:"Від брифу на вакансію до виходу кандидата",                  owner:"Talent Acquisition" },
-  { id:"device",      name:"Техніка та робоче місце",          desc:"Видача, налаштування, ремонт ноутбуків і периферії",          owner:"Operations" },
-  { id:"access",      name:"Доступи, акаунти, підписки",        desc:"Видача й закриття доступів до сервісів і софту",              owner:"Operations" },
-  { id:"performance", name:"Performance review",               desc:"Підготовка й супровід циклу оцінки результативності",         owner:"HR" },
-  { id:"adhoc",       name:"Разовий крос-функційний запит",     desc:"Нестандартна задача, що не лягає в жоден стандартний процес",  owner:"Operations" },
+  // Talent Acquisition
+  { id:"hire",        name:"Найм людини в команду",           desc:"Від брифу на вакансію до виходу кандидата",            owner:"Talent Acquisition" },
+  { id:"interview",   name:"Участь в інтервʼю кандидатів",     desc:"Організація співбесід і підтримка під час відбору",     owner:"Talent Acquisition" },
+  // HR
+  { id:"onboarding",  name:"Онбординг співробітника",         desc:"Перші тижні, адаптація, введення в процеси",           owner:"HR" },
+  { id:"performance", name:"Performance review",              desc:"Підготовка й супровід циклу оцінки результативності",   owner:"HR" },
+  { id:"timeoff",     name:"Відпустки та лікарняні",          desc:"Оформлення й облік відсутностей",                       owner:"HR" },
+  { id:"people",      name:"HR-підтримка й 1:1",              desc:"Допомога з людьми, конфлікти, розвиток",                owner:"HR" },
+  // Operations
+  { id:"device",      name:"Техніка та робоче місце",         desc:"Видача, налаштування, ремонт ноутбуків і периферії",    owner:"Operations" },
+  { id:"access",      name:"Доступи, акаунти, підписки",       desc:"Видача й закриття доступів до сервісів і софту",        owner:"Operations" },
+  { id:"office",      name:"Офіс і робочий простір",          desc:"Облаштування, видаткові матеріали, побутові питання",    owner:"Operations" },
+  { id:"adhoc",       name:"Разовий крос-функційний запит",    desc:"Нестандартна задача поза стандартними процесами",       owner:"Operations" },
+  // Finance
+  { id:"expense",     name:"Компенсації та витрати",          desc:"Оформлення й повернення робочих витрат",                owner:"Finance" },
+  { id:"payments",    name:"Оплати підрядникам і рахунки",     desc:"Проведення платежів, рахунки, закривні документи",      owner:"Finance" },
+  // Legal
+  { id:"legal",       name:"Договори та юридичні питання",     desc:"Підготовка й погодження договорів, консультації",       owner:"Legal" },
 ];
 
 const VALUE_Q  = "Наскільки сервіс корисний для цілей твоєї команди?";
@@ -368,15 +394,24 @@ const scaleHTML = (sid, axis, q, anchors, tag) => {
   </div>`;
 };
 
-document.getElementById("services").innerHTML = SERVICES.map(s => `
+const cardHTML = (s) => `
   <div class="card" data-sid="${s.id}">
-    <span class="owner">${s.owner}</span>
     <p class="name">${s.name}</p>
     <p class="desc">${s.desc}</p>
     ${scaleHTML(s.id,"value", VALUE_Q,  VALUE_A,  "Користь")}
     ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
     <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим сервісом</label>
-  </div>
+  </div>`;
+
+const groupOrder = [];
+const byOwner = {};
+SERVICES.forEach(s => {
+  if (!byOwner[s.owner]) { byOwner[s.owner] = []; groupOrder.push(s.owner); }
+  byOwner[s.owner].push(s);
+});
+document.getElementById("services").innerHTML = groupOrder.map(owner => `
+  <h2 class="group">${owner}</h2>
+  ${byOwner[owner].map(cardHTML).join("")}
 `).join("");
 
 /* ---- "не користуюсь" toggling ---- */
@@ -438,7 +473,9 @@ function showErr(msg){
 
 /* ---- summary ---- */
 function renderSummary(role, unit, team, answers, comment){
-  const payload = { role, unit, team, answers, comment, ts:new Date().toISOString() };
+  const submission_id = new Date().toISOString().replace(/[-:.TZ]/g,"").slice(0,15)
+    + "-" + Math.random().toString(36).slice(2,6);
+  const payload = { submission_id, role, unit, team, answers, comment, ts:new Date().toISOString() };
 
   document.getElementById("sumMeta").textContent = role + " · " + unit + " · " + team;
 
@@ -466,6 +503,20 @@ function renderSummary(role, unit, team, answers, comment){
     navigator.clipboard.writeText(JSON.stringify(payload))
       .then(()=> { const b=document.getElementById("copyBtn"); b.textContent="Скопійовано ✓"; setTimeout(()=>b.textContent="Скопіювати дані",1800); });
   };
+
+  const status = document.getElementById("saveStatus");
+  status.textContent = "Зберігаю…";
+  status.className = "savestatus";
+  fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  })
+  .then(()=> { status.textContent = "Збережено ✓"; status.className = "savestatus ok"; })
+  .catch(()=> {
+    status.textContent = "Не вдалось зберегти автоматично — натисни «Скопіювати дані» й надішли вручну.";
+    status.className = "savestatus fail";
+  });
 }
 </script>
 </body>
