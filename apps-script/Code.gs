@@ -1,8 +1,13 @@
+// ← Встав сюди ID Google-таблиці (частина URL між /d/ і /edit).
+//    Якщо скрипт прив'язаний до таблиці (створений через Extensions → Apps Script),
+//    можна лишити порожнім — тоді береться активна таблиця.
+var SHEET_ID = '';
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName('Responses') || ss.insertSheet('Responses');
     var data = JSON.parse(e.postData.contents);
 
