@@ -276,6 +276,21 @@
   .savestatus.ok{color:var(--value)}
   .savestatus.fail{color:var(--burden)}
 
+  /* ---- desktop: 2 картки в рядок ---- */
+  @media (min-width:940px){
+    #services, #customWrap{
+      width:860px;
+      margin-left:50%;
+      transform:translateX(-50%);
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:16px;
+      align-items:start;
+    }
+    #services > .group{grid-column:1 / -1}
+    #services > .card, #customWrap > .card{margin:0}
+  }
+
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
   }
