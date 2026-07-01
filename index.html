@@ -512,7 +512,11 @@ function renderSummary(role, unit, team, answers, comment){
     headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify(payload)
   })
-  .then(()=> { status.textContent = "Збережено ✓"; status.className = "savestatus ok"; })
+  .then(r => r.json())
+  .then(d => {
+    if (d && d.ok) { status.textContent = "Збережено ✓"; status.className = "savestatus ok"; }
+    else { throw new Error("server responded not ok"); }
+  })
   .catch(()=> {
     status.textContent = "Не вдалось зберегти автоматично — натисни «Скопіювати дані» й надішли вручну.";
     status.className = "savestatus fail";
