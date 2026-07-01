@@ -205,10 +205,12 @@
     color:var(--muted);background:none;border:1px solid var(--line);border-radius:8px;cursor:pointer;
   }
   .card.custom .rm:hover{color:var(--ink);border-color:var(--muted)}
+  .customsection{margin-top:40px}
+  .customhint{color:var(--muted);font-size:13.5px;margin:0 0 16px}
   .addcustom{
     width:100%;font-family:var(--body);font-size:15px;color:var(--ink);
     background:none;border:1px dashed var(--line);border-radius:12px;padding:14px;cursor:pointer;
-    margin:0 0 26px;
+    margin:0;
   }
   .addcustom:hover{border-color:var(--muted);background:var(--card)}
 
@@ -278,17 +280,26 @@
 
   /* ---- desktop: 2 картки в рядок ---- */
   @media (min-width:940px){
-    #services, #customWrap{
+    #services, .customsection{
       width:860px;
       margin-left:50%;
       transform:translateX(-50%);
+    }
+    #services{
       display:grid;
       grid-template-columns:repeat(2, 1fr);
       gap:16px;
       align-items:start;
     }
     #services > .group{grid-column:1 / -1}
-    #services > .card, #customWrap > .card{margin:0}
+    #services > .card{margin:0}
+    #customWrap{
+      display:grid;
+      grid-template-columns:repeat(2, 1fr);
+      gap:16px;
+      align-items:start;
+    }
+    #customWrap > .card{margin:0}
   }
 
   @media (prefers-reduced-motion:reduce){
@@ -341,8 +352,12 @@
 
     <div id="services"></div>
 
-    <div id="customWrap"></div>
-    <button type="button" class="addcustom" id="addCustom">+ Додати свій процес</button>
+    <div class="customsection">
+      <h2 class="group">Свій процес</h2>
+      <p class="customhint">Не знайшов потрібного в списку? Додай свій процес і оціни його так само.</p>
+      <div id="customWrap"></div>
+      <button type="button" class="addcustom" id="addCustom">+ Додати ще</button>
+    </div>
 
     <div class="comment">
       <label for="open">Що найбільше бісить — і чому? Чого бракує?</label>
@@ -461,15 +476,17 @@ const customHTML = (cid) => `
     ${scaleHTML("c"+cid,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
     <input type="text" class="scomment" id="ccomment-${cid}" placeholder="Коментар (необов'язково)">
   </div>`;
-document.getElementById("addCustom").addEventListener("click", () => {
+function addCustomBlock(focus){
   const cid = ++customSeq;
   customWrap.insertAdjacentHTML("beforeend", customHTML(cid));
-  document.getElementById(`cname-${cid}`).focus();
-});
+  if (focus) document.getElementById(`cname-${cid}`).focus();
+}
+document.getElementById("addCustom").addEventListener("click", () => addCustomBlock(true));
 customWrap.addEventListener("click", e => {
   const btn = e.target.closest(".rm");
   if (btn) { const el = customWrap.querySelector(`.card.custom[data-cid="${btn.dataset.cid}"]`); if (el) el.remove(); }
 });
+addCustomBlock(false); // один порожній блок за замовчуванням
 
 /* ---- submit ---- */
 const form = document.getElementById("form");
