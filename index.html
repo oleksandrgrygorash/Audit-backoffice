@@ -339,9 +339,8 @@
       <span class="lbl">Коментар</span>
       <span id="sumCommentText"></span>
     </div>
-    <pre id="json"></pre>
-    <button class="copy" id="copyBtn" type="button">Скопіювати дані</button>
     <p class="savestatus" id="saveStatus"></p>
+    <button class="copy" id="copyBtn" type="button" style="display:none">Скопіювати дані</button>
   </div>
 
 </div>
@@ -492,8 +491,6 @@ function renderSummary(role, unit, team, answers, comment){
     ce.style.display = "block";
   } else { ce.style.display = "none"; }
 
-  document.getElementById("json").textContent = JSON.stringify(payload, null, 2);
-
   form.style.display = "none";
   const sum = document.getElementById("summary");
   sum.classList.add("show");
@@ -520,6 +517,7 @@ function renderSummary(role, unit, team, answers, comment){
   .catch(()=> {
     status.textContent = "Не вдалось зберегти автоматично — натисни «Скопіювати дані» й надішли вручну.";
     status.className = "savestatus fail";
+    document.getElementById("copyBtn").style.display = "";
   });
 }
 </script>
