@@ -57,33 +57,17 @@
   .sub b{color:var(--ink);font-weight:600}
 
   .note{
-    border-left:3px solid var(--burden);
-    background:var(--burden-tint);
+    border-left:3px solid var(--line);
     padding:12px 14px;
     border-radius:0 8px 8px 0;
     font-size:13.5px;
-    color:#5A3C1E;
-    margin:0 0 26px;
+    margin:0 0 12px;
   }
-  .note b{color:#3F2A14}
-
-  .scaleinfo{
-    background:var(--card);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:16px 16px 14px;
-    margin:0 0 22px;
-  }
-  .scaleinfo .si-row{margin:0 0 4px;font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:8px}
-  .scaleinfo .si-scale{margin:0 0 14px;font-size:13px;color:var(--muted);padding-left:2px}
-  .scaleinfo .si-scale:last-child{margin-bottom:0}
-  .scaleinfo .si-scale b{color:var(--ink);font-family:var(--mono);font-size:12px}
-  .scaleinfo .si-tag{
-    font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
-    color:#fff;padding:3px 7px;border-radius:5px;flex-shrink:0;
-  }
-  .scaleinfo .si-v{background:var(--value)}
-  .scaleinfo .si-b{background:var(--burden)}
+  .note + .note{margin-bottom:26px}
+  .note--value{border-left-color:var(--value);background:var(--value-tint);color:#1F4A40}
+  .note--value b{color:#123A30}
+  .note--burden{border-left-color:var(--burden);background:var(--burden-tint);color:#5A3C1E}
+  .note--burden b{color:#3F2A14}
 
   .team{margin:0 0 30px}
   .team label{
@@ -119,13 +103,13 @@
 
   /* ---- group heading ---- */
   .group{
-    font-family:var(--mono);
-    font-size:11px;
-    letter-spacing:.12em;
-    text-transform:uppercase;
-    color:var(--muted);
-    margin:26px 0 12px;
-    padding-bottom:8px;
+    font-family:var(--display);
+    font-weight:600;
+    font-size:18px;
+    letter-spacing:-.01em;
+    color:var(--ink);
+    margin:32px 0 14px;
+    padding-bottom:9px;
     border-bottom:1px solid var(--line);
   }
   .group:first-child{margin-top:0}
@@ -199,6 +183,35 @@
   }
   .na input{width:16px;height:16px;accent-color:var(--ink);cursor:pointer}
 
+  /* per-service / custom comment input */
+  .scomment{
+    display:block;width:100%;margin-top:12px;
+    font-family:var(--body);font-size:14px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);border-radius:9px;padding:10px 12px;
+  }
+  .scomment:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+
+  /* ---- custom process ---- */
+  .card.custom{position:relative}
+  .card.custom .cname{
+    width:100%;margin:0 0 16px;
+    font-family:var(--display);font-weight:600;font-size:19px;color:var(--ink);
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  }
+  .card.custom .cname:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+  .card.custom .rm{
+    position:absolute;top:12px;right:12px;
+    width:28px;height:28px;line-height:1;font-size:18px;
+    color:var(--muted);background:none;border:1px solid var(--line);border-radius:8px;cursor:pointer;
+  }
+  .card.custom .rm:hover{color:var(--ink);border-color:var(--muted)}
+  .addcustom{
+    width:100%;font-family:var(--body);font-size:15px;color:var(--ink);
+    background:none;border:1px dashed var(--line);border-radius:12px;padding:14px;cursor:pointer;
+    margin:0 0 26px;
+  }
+  .addcustom:hover{border-color:var(--muted);background:var(--card)}
+
   /* ---- comment + submit ---- */
   .comment{margin:30px 0 26px}
   .comment label{
@@ -250,13 +263,9 @@
   .pill.v{background:var(--value)}
   .pill.b{background:var(--burden)}
   .pill.skip{background:#9AA09B}
+  .rowcomment{font-size:13px;color:var(--muted);padding:0 0 13px;margin-top:-6px}
   .comment-out{margin:18px 0;font-size:14px;color:var(--ink)}
   .comment-out .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin:0 0 5px}
-  pre{
-    background:#1A1C1A;color:#E8EBE6;border-radius:10px;
-    padding:14px;font-family:var(--mono);font-size:12px;line-height:1.5;
-    overflow:auto;margin:18px 0 12px;
-  }
   .copy{
     font-family:var(--body);font-size:14px;color:var(--ink);
     background:none;border:1px solid var(--line);border-radius:9px;
@@ -280,8 +289,11 @@
     <h1>Аудит сервісів очима команд</h1>
     <p class="sub">Оціни кожен сервіс за двома шкалами: <b>наскільки він корисний</b> і <b>скільки сил забирає</b>. Близько 5 хвилин.</p>
 
-    <div class="note">
-      <b>«Важкість»</b> — це скільки сил і часу витрачає <b>твоя команда</b>, щоб отримати результат. Не про те, наскільки складний процес усередині Back Office.
+    <div class="note note--value">
+      <b>«Користь»</b> — наскільки сервіс допомагає тобі чи твоїй команді досягати результату.
+    </div>
+    <div class="note note--burden">
+      <b>«Важкість»</b> — це скільки сил і часу витрачаєш ти чи твоя команда, щоб отримати результат.
     </div>
 
     <div class="team">
@@ -312,14 +324,10 @@
       <input id="team" type="text" placeholder="Назва твоєї команди" required>
     </div>
 
-    <div class="scaleinfo">
-      <p class="si-row"><span class="si-tag si-v">Користь</span> наскільки сервіс допомагає твоїй команді</p>
-      <p class="si-scale"><b>1</b> не впливає · <b>2</b> трохи допомагає · <b>3</b> помітно допомагає · <b>4</b> критично, без нього важко</p>
-      <p class="si-row"><span class="si-tag si-b">Важкість</span> скільки сил і часу забирає отримати результат</p>
-      <p class="si-scale"><b>1</b> легко, майже само · <b>2</b> дрібні затримки · <b>3</b> відчутно напряжно · <b>4</b> багато болю й пінг-понгу</p>
-    </div>
-
     <div id="services"></div>
+
+    <div id="customWrap"></div>
+    <button type="button" class="addcustom" id="addCustom">+ Додати свій процес</button>
 
     <div class="comment">
       <label for="open">Що найбільше бісить — і чому? Чого бракує?</label>
@@ -400,6 +408,7 @@ const cardHTML = (s) => `
     ${scaleHTML(s.id,"value", VALUE_Q,  VALUE_A,  "Користь")}
     ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
     <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим сервісом</label>
+    <input type="text" class="scomment" id="sc-${s.id}" placeholder="Коментар (необов'язково)">
   </div>`;
 
 const groupOrder = [];
@@ -426,6 +435,27 @@ SERVICES.forEach(s => {
   });
 });
 
+/* ---- власні процеси ---- */
+let customSeq = 0;
+const customWrap = document.getElementById("customWrap");
+const customHTML = (cid) => `
+  <div class="card custom" data-cid="${cid}">
+    <button type="button" class="rm" data-cid="${cid}" aria-label="Прибрати">×</button>
+    <input type="text" class="cname" id="cname-${cid}" placeholder="Назва свого процесу">
+    ${scaleHTML("c"+cid,"value", VALUE_Q,  VALUE_A,  "Користь")}
+    ${scaleHTML("c"+cid,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
+    <input type="text" class="scomment" id="ccomment-${cid}" placeholder="Коментар (необов'язково)">
+  </div>`;
+document.getElementById("addCustom").addEventListener("click", () => {
+  const cid = ++customSeq;
+  customWrap.insertAdjacentHTML("beforeend", customHTML(cid));
+  document.getElementById(`cname-${cid}`).focus();
+});
+customWrap.addEventListener("click", e => {
+  const btn = e.target.closest(".rm");
+  if (btn) { const el = customWrap.querySelector(`.card.custom[data-cid="${btn.dataset.cid}"]`); if (el) el.remove(); }
+});
+
 /* ---- submit ---- */
 const form = document.getElementById("form");
 const err  = document.getElementById("err");
@@ -446,11 +476,26 @@ form.addEventListener("submit", e => {
   const missing = [];
   const answers = SERVICES.map(s => {
     const na = document.getElementById(`na-${s.id}`).checked;
-    if (na) return { id:s.id, name:s.name, owner:s.owner, na:true };
+    const scomment = document.getElementById(`sc-${s.id}`).value.trim();
+    if (na) return { id:s.id, name:s.name, owner:s.owner, na:true, comment:scomment };
     const value = getVal(s.id,"value");
     const burden = getVal(s.id,"burden");
     if (value === null || burden === null) missing.push(s.name);
-    return { id:s.id, name:s.name, owner:s.owner, value, burden };
+    return { id:s.id, name:s.name, owner:s.owner, value, burden, comment:scomment };
+  });
+
+  // власні процеси: беремо лише блоки з назвою
+  const custom = [];
+  const customMissing = [];
+  customWrap.querySelectorAll(".card.custom").forEach(block => {
+    const cid = block.dataset.cid;
+    const name = document.getElementById(`cname-${cid}`).value.trim();
+    if (!name) return;
+    const value = getVal("c"+cid,"value");
+    const burden = getVal("c"+cid,"burden");
+    const ccomment = document.getElementById(`ccomment-${cid}`).value.trim();
+    if (value === null || burden === null) { customMissing.push(name); return; }
+    custom.push({ name, value, burden, comment:ccomment });
   });
 
   if (!role) { showErr("Спочатку обери, хто ти."); return; }
@@ -460,8 +505,12 @@ form.addEventListener("submit", e => {
     showErr("Залиш обидві оцінки або познач «не користуюсь» для: " + missing.join(", ") + ".");
     return;
   }
+  if (customMissing.length) {
+    showErr("Для свого процесу постав обидві оцінки (або прибери блок): " + customMissing.join(", ") + ".");
+    return;
+  }
 
-  renderSummary(role, unit, team, answers, document.getElementById("open").value.trim());
+  renderSummary(role, unit, team, answers, document.getElementById("open").value.trim(), custom);
 });
 
 function showErr(msg){
@@ -471,19 +520,33 @@ function showErr(msg){
 }
 
 /* ---- summary ---- */
-function renderSummary(role, unit, team, answers, comment){
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderSummary(role, unit, team, answers, comment, custom){
   const submission_id = new Date().toISOString().replace(/[-:.TZ]/g,"").slice(0,15)
     + "-" + Math.random().toString(36).slice(2,6);
-  const payload = { submission_id, role, unit, team, answers, comment, ts:new Date().toISOString() };
+  const payload = { submission_id, role, unit, team, answers, custom, comment, ts:new Date().toISOString() };
 
   document.getElementById("sumMeta").textContent = role + " · " + unit + " · " + team;
 
-  document.getElementById("sumRows").innerHTML = answers.map(a => {
+  const rowHTML = (name, scores, cmt) =>
+    `<div class="row"><span class="rn">${name}</span><span class="scores">${scores}</span></div>` +
+    (cmt ? `<div class="rowcomment">${esc(cmt)}</div>` : "");
+
+  const serviceRows = answers.map(a => {
     const scores = a.na
       ? `<span class="pill skip">не користується</span>`
       : `<span class="pill v">користь ${a.value}</span><span class="pill b">важкість ${a.burden}</span>`;
-    return `<div class="row"><span class="rn">${a.name}</span><span class="scores">${scores}</span></div>`;
+    return rowHTML(esc(a.name), scores, a.comment);
   }).join("");
+
+  const customRows = (custom || []).map(c =>
+    rowHTML("➕ " + esc(c.name),
+      `<span class="pill v">користь ${c.value}</span><span class="pill b">важкість ${c.burden}</span>`,
+      c.comment)
+  ).join("");
+
+  document.getElementById("sumRows").innerHTML = serviceRows + customRows;
 
   const ce = document.getElementById("sumComment");
   if (comment){

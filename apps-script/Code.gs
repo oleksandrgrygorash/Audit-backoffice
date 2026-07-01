@@ -17,20 +17,23 @@ function doPost(e) {
       data.answers.forEach(function (a) {
         header.push(a.name + ' · користь');
         header.push(a.name + ' · важкість');
+        header.push(a.name + ' · коментар');
       });
+      header.push('Власні процеси');
       sheet.appendRow(header);
     }
 
     var row = [data.ts, data.submission_id, data.role, data.unit, data.team, data.comment || ''];
     data.answers.forEach(function (a) {
-      if (a.na) {
-        row.push('—');
-        row.push('—');
-      } else {
-        row.push(a.value);
-        row.push(a.burden);
-      }
+      if (a.na) { row.push('—'); row.push('—'); }
+      else { row.push(a.value); row.push(a.burden); }
+      row.push(a.comment || '');
     });
+    var custom = (data.custom || []).map(function (c) {
+      return c.name + ': користь ' + c.value + ', важкість ' + c.burden + (c.comment ? ' — ' + c.comment : '');
+    }).join(' | ');
+    row.push(custom);
+
     sheet.appendRow(row);
 
     return ContentService
@@ -53,8 +56,11 @@ function testDoPost() {
     role: 'Manager', unit: 'Soportio', team: 'QA',
     comment: 'тестова відповідь',
     answers: [
-      { id: 'hire', name: 'Найм людини', owner: 'Talent Acquisition', value: 3, burden: 4 },
-      { id: 'device', name: 'Техніка', owner: 'Operations', na: true }
+      { id: 'hire', name: 'Найм людини', owner: 'Talent Acquisition', value: 3, burden: 4, comment: 'ок' },
+      { id: 'device', name: 'Техніка', owner: 'Operations', na: true, comment: '' }
+    ],
+    custom: [
+      { name: 'Свій процес', value: 2, burden: 4, comment: 'тестовий' }
     ]
   };
   doPost({ postData: { contents: JSON.stringify(payload) } });
