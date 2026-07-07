@@ -313,7 +313,7 @@
   <form id="form">
     <p class="eyebrow">Quarks · Back Office</p>
     <h1>Аудит сервісів очима команд</h1>
-    <p class="sub">Оціни кожен сервіс за двома шкалами: <b>наскільки він корисний</b> і <b>скільки сил забирає</b>. Близько 5 хвилин.</p>
+    <p class="sub">Оціни за двома шкалами: <b>наскільки сервіс корисний</b> і <b>скільки сил забирає</b>. Оцінюй лише те, чим користуєшся — решту познач «не користуюсь». ~10 хвилин.</p>
 
     <div class="note note--value">
       <b>«Користь»</b> — наскільки сервіс допомагає тобі чи твоїй команді досягати результату.
@@ -389,24 +389,55 @@ const ENDPOINT = "https://script.google.com/macros/s/AKfycbyYxkvpBPLstz8L-4XFhi5
 
 /* ====== Сервіси для оцінки. Наповнювати = дописати об'єкти. ====== */
 const SERVICES = [
-  // Talent Acquisition
-  { id:"hire",        name:"Найм людини в команду",           desc:"Від брифу на вакансію до виходу кандидата",            owner:"Talent Acquisition" },
-  { id:"interview",   name:"Участь в інтервʼю кандидатів",     desc:"Організація співбесід і підтримка під час відбору",     owner:"Talent Acquisition" },
   // HR
-  { id:"onboarding",  name:"Онбординг співробітника",         desc:"Перші тижні, адаптація, введення в процеси",           owner:"HR" },
-  { id:"performance", name:"Performance review",              desc:"Підготовка й супровід циклу оцінки результативності",   owner:"HR" },
-  { id:"timeoff",     name:"Відпустки та лікарняні",          desc:"Оформлення й облік відсутностей",                       owner:"HR" },
-  { id:"people",      name:"HR-підтримка й 1:1",              desc:"Допомога з людьми, конфлікти, розвиток",                owner:"HR" },
-  // Operations
-  { id:"device",      name:"Техніка та робоче місце",         desc:"Видача, налаштування, ремонт ноутбуків і периферії",    owner:"Operations" },
-  { id:"access",      name:"Доступи, акаунти, підписки",       desc:"Видача й закриття доступів до сервісів і софту",        owner:"Operations" },
-  { id:"office",      name:"Офіс і робочий простір",          desc:"Облаштування, видаткові матеріали, побутові питання",    owner:"Operations" },
-  { id:"adhoc",       name:"Разовий крос-функційний запит",    desc:"Нестандартна задача поза стандартними процесами",       owner:"Operations" },
+  { id:"onboarding",     name:"Онбординг співробітника",          desc:"Перші тижні, адаптація, buddy-підтримка, занурення в процеси", owner:"HR" },
+  { id:"career",         name:"Кар'єрне зростання та розвиток",    desc:"Кар'єрний трек, грейди та очікування до ролі",            owner:"HR" },
+  { id:"performance",    name:"Performance review",               desc:"Цикл збору фідбеку та оцінки результативності",           owner:"HR" },
+  { id:"offboarding",    name:"Offboarding співробітника",        desc:"Вихід із компанії, передача справ, завершення співпраці",  owner:"HR" },
+  { id:"people_partner", name:"People partnership",               desc:"Підтримка менеджерів і команд у піпл-кейсах",             owner:"HR" },
+  { id:"enps",           name:"eNPS",                             desc:"Регулярне опитування залученості та аналіз результатів",  owner:"HR" },
+  { id:"lnd",            name:"L&D для менеджерів",                desc:"Навчання, програми розвитку та підтримка менеджерської ролі", owner:"HR" },
+
+  // Admin
+  { id:"admin_clevel",   name:"Адміністративна підтримка C-level", desc:"Організаційні запити, документи, координація для керівників", owner:"Admin" },
+  { id:"travel",         name:"Організація відряджень",           desc:"Логістика та фінансовий супровід поїздок",                owner:"Admin" },
+
+  // Compliance
+  { id:"comp_creatives", name:"Перевірка креативів",              desc:"Відповідність креативів вимогам комплаєнсу",              owner:"Compliance" },
+  { id:"comp_texts",     name:"Перевірка текстів",                desc:"Ризики та відповідність текстів вимогам комплаєнсу",       owner:"Compliance" },
+  { id:"comp_adaccounts",name:"Розблокування рекламних кабінетів",  desc:"Верифікація та розблокування кабінетів і платформ",       owner:"Compliance" },
+  { id:"comp_reputation",name:"Репутаційні ризики",               desc:"Оцінки, відгуки, SERM",                                   owner:"Compliance" },
+  { id:"comp_stores",    name:"Вимоги сторів і платформ",          desc:"Запити щодо вимог сторів та рекламних платформ",          owner:"Compliance" },
+
+  // Employer Brand
+  { id:"eb_ext_events",  name:"Зовнішні івенти",                  desc:"Виступи спікером, ярмарки вакансій, нетворкінг — підготовка, бриф, координація", owner:"Employer Brand" },
+  { id:"eb_courses",     name:"Курси, воркшопи, інтенсиви",        desc:"Організація навчальних програм для подальшого найму",      owner:"Employer Brand" },
+  { id:"eb_int_events",  name:"Внутрішні корпоративні івенти",      desc:"Тімбілдинги, епізоди, демо-дні, піврічні івенти компанії",  owner:"Employer Brand" },
+
+  // Internal Communications
+  { id:"ic_merch",       name:"Мерч",                             desc:"Розробка та виготовлення айтемів",                        owner:"Internal Communications" },
+  { id:"ic_heart",       name:"Внутрішні активності (HEART Actions)", desc:"Програма мотивації та визнання співробітників",       owner:"Internal Communications" },
+  { id:"ic_comms",       name:"Внутрішні комунікації",             desc:"Анонси, апдейти, звернення, структура для Confluence / Slack", owner:"Internal Communications" },
+
+  // Marketing
+  { id:"mkt_smm",        name:"SMM для бізнес-юнітів",             desc:"Контент-стратегія, LinkedIn C-level, копірайт, EGC, аналітика", owner:"Marketing" },
+  { id:"mkt_design",     name:"Бренд-дизайн для бізнес-юнітів",     desc:"Презентації, лендинги, айдентика, брендові матеріали",      owner:"Marketing" },
+
   // Finance
-  { id:"expense",     name:"Компенсації та витрати",          desc:"Оформлення й повернення робочих витрат",                owner:"Finance" },
-  { id:"payments",    name:"Оплати підрядникам і рахунки",     desc:"Проведення платежів, рахунки, закривні документи",      owner:"Finance" },
+  { id:"fin_salary",     name:"Зарплата й податки",               desc:"Нарахування, вирахування, точкові питання по податках",   owner:"Finance" },
+  { id:"fin_invoices",   name:"Оплата інвойсів",                  desc:"Оплата рахунків по послугах і сервісах",                   owner:"Finance" },
+
   // Legal
-  { id:"legal",       name:"Договори та юридичні питання",     desc:"Підготовка й погодження договорів, консультації",       owner:"Legal" },
+  { id:"legal_contracts",name:"Договори",                         desc:"Вичитка, погодження, підписання (маркетингові, інтра-груп, послуги, NDA, SaaS)", owner:"Legal" },
+  { id:"legal_adhoc",    name:"Ad hoc юридичні запити",            desc:"Запити від продуктових і бек-офіс команд",                owner:"Legal" },
+  { id:"legal_compliance",name:"Комплаєнс-рев'ю продуктів",        desc:"Рев'ю екранів, funnels, first look, AI, data protection, online safety", owner:"Legal" },
+  { id:"legal_hr",       name:"Договори зі співробітниками",        desc:"Договори й довідки для співробітників і фрілансерів (шаблони PandaDoc)", owner:"Legal" },
+
+  // Ops
+  { id:"ops_infra",      name:"Інфраструктурний опитувальник",     desc:"Збір і актуалізація даних про інфраструктуру",            owner:"Ops" },
+  { id:"ops_okr",        name:"OKR як фреймворк",                 desc:"Підтримка постановки та відстеження цілей",               owner:"Ops" },
+  { id:"ops_tech",       name:"Техніка в офісі",                  desc:"Питання по техніці та обладнанню в офісі",                owner:"Ops" },
+  { id:"ops_subs",       name:"Підписки",                         desc:"Запити по роботі з підписками та сервісами",              owner:"Ops" },
 ];
 
 const VALUE_Q  = "Наскільки сервіс корисний для цілей твоєї команди?";
