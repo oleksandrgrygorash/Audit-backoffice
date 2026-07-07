@@ -16,7 +16,7 @@
     --line:#E0E2DD;
     --value:#2E7D6B;      /* вісь "Користь" */
     --value-tint:#E6F1ED;
-    --burden:#B5672A;     /* вісь "Важкість" */
+    --burden:#B5672A;     /* вісь "Складність" */
     --burden-tint:#F6ECE0;
     --ring:#1A1C1A;
     --display:"Geologica",system-ui,sans-serif;
@@ -191,6 +191,14 @@
   }
   .scomment:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
 
+  /* перетин з інфра-опитувальником (маркер для рев'ю) */
+  .card.has-infra{border-color:#D9A93A}
+  .infra-note{
+    margin:0 0 16px;padding:9px 11px;border-radius:8px;
+    background:#FBF3DF;color:#6E5312;font-size:12.5px;line-height:1.45;
+  }
+  .infra-note b{color:#4E3A0C;font-weight:600}
+
   /* ---- custom process ---- */
   .card.custom{position:relative}
   .card.custom .cname{
@@ -319,7 +327,7 @@
       <b>«Користь»</b> — наскільки сервіс допомагає тобі чи твоїй команді досягати результату.
     </div>
     <div class="note note--burden">
-      <b>«Важкість»</b> — це скільки сил і часу витрачаєш ти чи твоя команда, щоб отримати результат.
+      <b>«Складність»</b> — це скільки сил і часу витрачаєш ти чи твоя команда, щоб отримати результат.
     </div>
 
     <div class="team">
@@ -400,7 +408,7 @@ const SERVICES = [
 
   // Admin
   { id:"admin_clevel",   name:"Адміністративна підтримка C-level", desc:"Організаційні запити, документи, координація для керівників", owner:"Admin" },
-  { id:"travel",         name:"Організація відряджень",           desc:"Логістика та фінансовий супровід поїздок",                owner:"Admin" },
+  { id:"travel",         name:"Організація відряджень",           desc:"Логістика та фінансовий супровід поїздок", infra:"Відрядження організовуються відповідно до політики",                owner:"Admin" },
 
   // Compliance
   { id:"comp_creatives", name:"Перевірка креативів",              desc:"Відповідність креативів вимогам комплаєнсу",              owner:"Compliance" },
@@ -416,12 +424,12 @@ const SERVICES = [
 
   // Internal Communications
   { id:"ic_merch",       name:"Мерч",                             desc:"Розробка та виготовлення айтемів",                        owner:"Internal Communications" },
-  { id:"ic_heart",       name:"Внутрішні активності (HEART Actions)", desc:"Програма мотивації та визнання співробітників",       owner:"Internal Communications" },
-  { id:"ic_comms",       name:"Внутрішні комунікації",             desc:"Анонси, апдейти, звернення, структура для Confluence / Slack", owner:"Internal Communications" },
+  { id:"ic_heart",       name:"Внутрішні активності (HEART Actions)", desc:"Програма мотивації та визнання співробітників", infra:"Серед айтемів у Heart Actions є те, що мені хотілося б отримати",       owner:"Internal Communications" },
+  { id:"ic_comms",       name:"Внутрішні комунікації",             desc:"Анонси, апдейти, звернення, структура для Confluence / Slack", infra:"Формат і канали комунікацій підходять мені; інформація на Confluence зрозуміло організована", owner:"Internal Communications" },
 
   // Marketing
   { id:"mkt_smm",        name:"SMM для бізнес-юнітів",             desc:"Контент-стратегія, LinkedIn C-level, копірайт, EGC, аналітика", owner:"Marketing" },
-  { id:"mkt_design",     name:"Бренд-дизайн для бізнес-юнітів",     desc:"Презентації, лендинги, айдентика, брендові матеріали",      owner:"Marketing" },
+  { id:"mkt_design",     name:"Бренд-дизайн для бізнес-юнітів",     desc:"Презентації, лендинги, айдентика, брендові матеріали", infra:"Оцінка Brand Design: якість рішень, швидкість/дедлайни, зручність співпраці",      owner:"Marketing" },
 
   // Finance
   { id:"fin_salary",     name:"Зарплата й податки",               desc:"Нарахування, вирахування, точкові питання по податках",   owner:"Finance" },
@@ -434,10 +442,10 @@ const SERVICES = [
   { id:"legal_hr",       name:"Договори зі співробітниками",        desc:"Договори й довідки для співробітників і фрілансерів (шаблони PandaDoc)", owner:"Legal" },
 
   // Ops
-  { id:"ops_infra",      name:"Інфраструктурний опитувальник",     desc:"Збір і актуалізація даних про інфраструктуру",            owner:"Ops" },
-  { id:"ops_okr",        name:"OKR як фреймворк",                 desc:"Підтримка постановки та відстеження цілей",               owner:"Ops" },
-  { id:"ops_tech",       name:"Техніка в офісі",                  desc:"Питання по техніці та обладнанню в офісі",                owner:"Ops" },
-  { id:"ops_subs",       name:"Підписки",                         desc:"Запити по роботі з підписками та сервісами",              owner:"Ops" },
+  { id:"ops_infra",      name:"Інфраструктурний опитувальник",     desc:"Збір і актуалізація даних про інфраструктуру", infra:"Це і є цей інфра-опитувальник — рейтинг дублює сам його формат",            owner:"Ops" },
+  { id:"ops_okr",        name:"OKR як фреймворк",                 desc:"Підтримка постановки та відстеження цілей", infra:"Оцінка OKR: ясність цілей, пріоритезація, методологічна підтримка, що заважає",               owner:"Ops" },
+  { id:"ops_tech",       name:"Техніка в офісі",                  desc:"Питання по техніці та обладнанню в офісі", infra:"Мене влаштовує якість і стан корпоративної техніки, якою користуюся",                owner:"Ops" },
+  { id:"ops_subs",       name:"Підписки",                         desc:"Запити по роботі з підписками та сервісами", infra:"Процес отримання/продовження доступів і ліцензій до зовнішніх сервісів зручний",              owner:"Ops" },
 ];
 
 const VALUE_Q  = "Наскільки сервіс корисний для цілей твоєї команди?";
@@ -463,11 +471,12 @@ const scaleHTML = (sid, axis, q, anchors, tag) => {
 };
 
 const cardHTML = (s) => `
-  <div class="card" data-sid="${s.id}">
+  <div class="card${s.infra ? " has-infra" : ""}" data-sid="${s.id}">
     <p class="name">${s.name}</p>
     <p class="desc">${s.desc}</p>
+    ${s.infra ? `<p class="infra-note"><b>🔎 Перетин з інфра-опитувальником:</b> «${s.infra}»</p>` : ""}
     ${scaleHTML(s.id,"value", VALUE_Q,  VALUE_A,  "Користь")}
-    ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
+    ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Складність")}
     <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим сервісом</label>
     <input type="text" class="scomment" id="sc-${s.id}" placeholder="Коментар (необов'язково)">
   </div>`;
@@ -504,7 +513,7 @@ const customHTML = (cid) => `
     <button type="button" class="rm" data-cid="${cid}" aria-label="Прибрати">×</button>
     <input type="text" class="cname" id="cname-${cid}" placeholder="Назва свого процесу">
     ${scaleHTML("c"+cid,"value", VALUE_Q,  VALUE_A,  "Користь")}
-    ${scaleHTML("c"+cid,"burden",BURDEN_Q, BURDEN_A, "Важкість")}
+    ${scaleHTML("c"+cid,"burden",BURDEN_Q, BURDEN_A, "Складність")}
     <input type="text" class="scomment" id="ccomment-${cid}" placeholder="Коментар (необов'язково)">
   </div>`;
 function addCustomBlock(focus){
@@ -599,13 +608,13 @@ function renderSummary(role, unit, team, answers, comment, custom){
   const serviceRows = answers.map(a => {
     const scores = a.na
       ? `<span class="pill skip">не користується</span>`
-      : `<span class="pill v">користь ${a.value}</span><span class="pill b">важкість ${a.burden}</span>`;
+      : `<span class="pill v">користь ${a.value}</span><span class="pill b">складність ${a.burden}</span>`;
     return rowHTML(esc(a.name), scores, a.comment);
   }).join("");
 
   const customRows = (custom || []).map(c =>
     rowHTML("➕ " + esc(c.name),
-      `<span class="pill v">користь ${c.value}</span><span class="pill b">важкість ${c.burden}</span>`,
+      `<span class="pill v">користь ${c.value}</span><span class="pill b">складність ${c.burden}</span>`,
       c.comment)
   ).join("");
 

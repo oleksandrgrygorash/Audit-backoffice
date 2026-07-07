@@ -16,7 +16,7 @@ function doPost(e) {
       var header = ['timestamp', 'submission_id', 'role', 'unit', 'team', 'comment'];
       data.answers.forEach(function (a) {
         header.push(a.name + ' · користь');
-        header.push(a.name + ' · важкість');
+        header.push(a.name + ' · складність');
         header.push(a.name + ' · коментар');
       });
       header.push('Власні процеси');
@@ -30,7 +30,7 @@ function doPost(e) {
       row.push(a.comment || '');
     });
     var custom = (data.custom || []).map(function (c) {
-      return c.name + ': користь ' + c.value + ', важкість ' + c.burden + (c.comment ? ' — ' + c.comment : '');
+      return c.name + ': користь ' + c.value + ', складність ' + c.burden + (c.comment ? ' — ' + c.comment : '');
     }).join(' | ');
     row.push(custom);
 
