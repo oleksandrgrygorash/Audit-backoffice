@@ -199,6 +199,14 @@
   }
   .infra-note b{color:#4E3A0C;font-weight:600}
 
+  /* бейдж процес/функція (маркер для рев'ю) */
+  .kind{
+    display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;padding:3px 7px;border-radius:5px;margin:0 0 8px;
+  }
+  .kind--proc{background:var(--value-tint);color:#2E7D6B}
+  .kind--fn{background:#F6E1DE;color:#A23B2E}
+
   /* ---- custom process ---- */
   .card.custom{position:relative}
   .card.custom .cname{
@@ -321,7 +329,7 @@
   <form id="form">
     <p class="eyebrow">Quarks · Back Office</p>
     <h1>Аудит Back Office сервісів</h1>
-    <p class="sub">Оціни за двома шкалами: <b>наскільки сервіс корисний</b> і <b>скільки сил забирає</b>. Оцінюй лише те, чим користуєшся — решту познач «не користуюсь». Приблизний час на заповнення — 5–10 хвилин.</p>
+    <p class="sub">Оціни за двома шкалами: <b>наскільки процес корисний</b> і <b>скільки сил забирає</b>. Оцінюй лише те, чим користуєшся — решту познач «не користуюсь». Приблизний час на заповнення — 5–10 хвилин.</p>
 
     <div class="note note--value">
       <b>«Користь»</b> — наскільки сервіс допомагає тобі чи твоїй команді досягати результату.
@@ -399,15 +407,15 @@ const ENDPOINT = "https://script.google.com/macros/s/AKfycbyYxkvpBPLstz8L-4XFhi5
 const SERVICES = [
   // HR
   { id:"onboarding",     name:"Онбординг співробітника",          desc:"Перші тижні, адаптація, buddy-підтримка, занурення в процеси", owner:"HR" },
-  { id:"career",         name:"Кар'єрне зростання та розвиток",    desc:"Кар'єрний трек, грейди та очікування до ролі",            owner:"HR" },
+  { id:"career", kind:"функція",         name:"Кар'єрне зростання та розвиток",    desc:"Кар'єрний трек, грейди та очікування до ролі",            owner:"HR" },
   { id:"performance",    name:"Performance review",               desc:"Цикл збору фідбеку та оцінки результативності",           owner:"HR" },
   { id:"offboarding",    name:"Offboarding співробітника",        desc:"Вихід із компанії, передача справ, завершення співпраці",  owner:"HR" },
-  { id:"people_partner", name:"People partnership",               desc:"Підтримка менеджерів і команд у піпл-кейсах",             owner:"HR" },
+  { id:"people_partner", kind:"функція", name:"People partnership",               desc:"Підтримка менеджерів і команд у піпл-кейсах",             owner:"HR" },
   { id:"enps",           name:"eNPS",                             desc:"Регулярне опитування залученості та аналіз результатів",  owner:"HR" },
-  { id:"lnd",            name:"L&D для менеджерів",                desc:"Навчання, програми розвитку та підтримка менеджерської ролі", owner:"HR" },
+  { id:"lnd", kind:"функція",            name:"L&D для менеджерів",                desc:"Навчання, програми розвитку та підтримка менеджерської ролі", owner:"HR" },
 
   // Admin
-  { id:"admin_clevel",   name:"Адміністративна підтримка C-level", desc:"Організаційні запити, документи, координація для керівників", owner:"Admin" },
+  { id:"admin_clevel", kind:"функція",   name:"Адміністративна підтримка C-level", desc:"Організаційні запити, особисті доручення, координація для керівників", owner:"Admin" },
   { id:"travel",         name:"Організація відряджень",           desc:"Логістика та фінансовий супровід поїздок", infra:"Відрядження організовуються відповідно до політики",                owner:"Admin" },
 
   // Compliance
@@ -418,21 +426,21 @@ const SERVICES = [
   { id:"comp_stores",    name:"Вимоги сторів і платформ",          desc:"Запити щодо вимог сторів та рекламних платформ",          owner:"Compliance" },
 
   // Employer Brand
-  { id:"eb_ext_events",  name:"Зовнішні івенти",                  desc:"Виступи спікером, ярмарки вакансій, нетворкінг — підготовка, бриф, координація", owner:"Employer Brand" },
+  { id:"eb_ext_events",  name:"Організація зовнішніх івентів",                  desc:"Виступи спікером, ярмарки вакансій, нетворкінг — підготовка, бриф, координація", owner:"Employer Brand" },
   { id:"eb_courses",     name:"Курси, воркшопи, інтенсиви",        desc:"Організація навчальних програм для подальшого найму",      owner:"Employer Brand" },
   { id:"eb_int_events",  name:"Внутрішні корпоративні івенти",      desc:"Тімбілдинги, епізоди, демо-дні, піврічні івенти компанії",  owner:"Employer Brand" },
 
   // Internal Communications
   { id:"ic_merch",       name:"Мерч",                             desc:"Розробка та виготовлення айтемів",                        owner:"Internal Communications" },
-  { id:"ic_heart",       name:"Внутрішні активності (HEART Actions)", desc:"Програма мотивації та визнання співробітників", infra:"Серед айтемів у Heart Actions є те, що мені хотілося б отримати",       owner:"Internal Communications" },
-  { id:"ic_comms",       name:"Внутрішні комунікації",             desc:"Анонси, апдейти, звернення, структура для Confluence / Slack", infra:"Формат і канали комунікацій підходять мені; інформація на Confluence зрозуміло організована", owner:"Internal Communications" },
+  { id:"ic_heart", kind:"функція",       name:"Внутрішні активності (HEART Actions)", desc:"Програма мотивації та визнання співробітників", infra:"Серед айтемів у Heart Actions є те, що мені хотілося б отримати",       owner:"Internal Communications" },
+  { id:"ic_comms", kind:"функція",       name:"Внутрішні комунікації",             desc:"Анонси, апдейти, звернення, структура для Confluence / Slack", infra:"Формат і канали комунікацій підходять мені; інформація на Confluence зрозуміло організована", owner:"Internal Communications" },
 
   // Communications
-  { id:"mkt_smm",        name:"SMM для бізнес-юнітів",             desc:"Контент-стратегія, LinkedIn C-level, копірайт, EGC, аналітика", owner:"Communications" },
-  { id:"mkt_design",     name:"Бренд-дизайн для бізнес-юнітів",     desc:"Презентації, лендинги, айдентика, брендові матеріали", infra:"Оцінка Brand Design: якість рішень, швидкість/дедлайни, зручність співпраці",      owner:"Communications" },
+  { id:"mkt_smm", kind:"функція",        name:"SMM для бізнес-юнітів",             desc:"Контент-стратегія, LinkedIn C-level, копірайт, EGC, аналітика", owner:"Communications" },
+  { id:"mkt_design", kind:"функція",     name:"Бренд-дизайн для бізнес-юнітів",     desc:"Презентації, лендинги, айдентика, брендові матеріали", infra:"Оцінка Brand Design: якість рішень, швидкість/дедлайни, зручність співпраці",      owner:"Communications" },
 
   // Finance
-  { id:"fin_salary",     name:"Зарплата й податки",               desc:"Нарахування, вирахування, точкові питання по податках",   owner:"Finance" },
+  { id:"fin_salary", kind:"функція",     name:"Зарплата й податки",               desc:"Нарахування, вирахування, точкові питання по податках",   owner:"Finance" },
   { id:"fin_invoices",   name:"Оплата інвойсів",                  desc:"Оплата рахунків по послугах і сервісах",                   owner:"Finance" },
 
   // Legal
@@ -442,16 +450,16 @@ const SERVICES = [
   { id:"legal_hr",       name:"Договори зі співробітниками",        desc:"Договори й довідки для співробітників і фрілансерів (шаблони PandaDoc)", owner:"Legal" },
 
   // Ops
-  { id:"ops_infra",      name:"Інфраструктурний опитувальник",     desc:"Збір і актуалізація даних про інфраструктуру", infra:"Це і є цей інфра-опитувальник — рейтинг дублює сам його формат",            owner:"Ops" },
-  { id:"ops_okr",        name:"OKR як фреймворк",                 desc:"Підтримка постановки та відстеження цілей", infra:"Оцінка OKR: ясність цілей, пріоритезація, методологічна підтримка, що заважає",               owner:"Ops" },
+  { id:"ops_infra", kind:"функція",      name:"Інфраструктурний опитувальник",     desc:"Збір і актуалізація даних про інфраструктуру", infra:"Це і є цей інфра-опитувальник — рейтинг дублює сам його формат",            owner:"Ops" },
+  { id:"ops_okr", kind:"функція",        name:"OKR як фреймворк",                 desc:"Підтримка постановки та відстеження цілей", infra:"Оцінка OKR: ясність цілей, пріоритезація, методологічна підтримка, що заважає",               owner:"Ops" },
   { id:"ops_tech",       name:"Техніка в офісі",                  desc:"Питання по техніці та обладнанню в офісі", infra:"Мене влаштовує якість і стан корпоративної техніки, якою користуюся",                owner:"Ops" },
   { id:"ops_subs",       name:"Підписки",                         desc:"Запити по роботі з підписками та сервісами", infra:"Процес отримання/продовження доступів і ліцензій до зовнішніх сервісів зручний",              owner:"Ops" },
 ];
 
-const VALUE_Q  = "Наскільки сервіс корисний для цілей твоєї команди?";
-const VALUE_A  = ["не впливає","трохи","помітно","критично"];
-const BURDEN_Q = "Скільки зусиль і часу команда витрачає, щоб отримати результат?";
-const BURDEN_A = ["легко","дрібниці","напряжно","боляче"];
+const VALUE_Q  = "Наскільки процес корисний для тебе чи твоєї команди?";
+const VALUE_A  = ["не впливає","трохи","помітно","сильно","критично"];
+const BURDEN_Q = "Скільки зусиль і часу ти чи твоя команда вкладаєш, щоб отримати результат від процесу?";
+const BURDEN_A = ["легко","незначно","помірно","важко","дуже важко"];
 
 /* ---- render ---- */
 const scaleHTML = (sid, axis, q, anchors, tag) => {
@@ -472,12 +480,13 @@ const scaleHTML = (sid, axis, q, anchors, tag) => {
 
 const cardHTML = (s) => `
   <div class="card${s.infra ? " has-infra" : ""}" data-sid="${s.id}">
+    <span class="kind kind--${s.kind === "функція" ? "fn" : "proc"}">${s.kind || "процес"}</span>
     <p class="name">${s.name}</p>
     <p class="desc">${s.desc}</p>
     ${s.infra ? `<p class="infra-note"><b>🔎 Перетин з інфра-опитувальником:</b> «${s.infra}»</p>` : ""}
     ${scaleHTML(s.id,"value", VALUE_Q,  VALUE_A,  "Користь")}
     ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Складність")}
-    <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим сервісом</label>
+    <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим процесом</label>
     <input type="text" class="scomment" id="sc-${s.id}" placeholder="Коментар (необов'язково)">
   </div>`;
 
