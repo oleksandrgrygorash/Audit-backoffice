@@ -486,7 +486,6 @@ const scaleHTML = (sid, axis, q, anchors, tag) => {
 
 const cardHTML = (s) => `
   <div class="card${s.infra ? " has-infra" : ""}" data-sid="${s.id}">
-    <span class="kind kind--${s.kind === "функція" ? "fn" : "proc"}">${s.kind || "процес"}</span>
     <p class="name">${s.name}</p>
     <p class="desc">${s.desc}</p>
     ${s.infra ? `<p class="infra-note"><b>🔎 Перетин з інфра-опитувальником:</b> «${s.infra}»</p>` : ""}
