@@ -328,14 +328,14 @@
 
   <form id="form">
     <p class="eyebrow">Quarks · Back Office</p>
-    <h1>Аудит Back Office сервісів</h1>
-    <p class="sub">Оціни за двома шкалами: <b>наскільки процес корисний</b> і <b>скільки сил забирає</b>. Оцінюй лише те, чим користуєшся — решту познач «не користуюсь». Приблизний час на заповнення — 5–10 хвилин.</p>
+    <h1>Аудит сервісів Back Office</h1>
+    <p class="sub">Оціни кожен сервіс за двома критеріями: <b>користь</b> та <b>складність</b>. Оцінюй лише те, з чим реально стикаєшся в роботі — для решти пунктів просто обери варіант «не користуюсь».</p>
 
     <div class="note note--value">
       <b>«Користь»</b> — наскільки сервіс допомагає тобі чи твоїй команді досягати результату.
     </div>
     <div class="note note--burden">
-      <b>«Складність»</b> — наскільки важко тобі чи твоїй команді отримати результат: скільки сил, часу й кроків це забирає.
+      <b>«Складність»</b> — скільки часу, сил та зайвих кроків іде на те, щоб закрити задачу через цей сервіс.
     </div>
 
     <div class="team">
@@ -343,8 +343,8 @@
       <select id="role" required>
         <option value="" disabled selected>— обери —</option>
         <option>C-level</option>
-        <option>Manager</option>
-        <option>Individual Contributor</option>
+        <option>Manager / Lead</option>
+        <option>Specialist / IC</option>
       </select>
     </div>
 
@@ -361,9 +361,9 @@
     </div>
 
     <div class="team">
-      <label for="team">Твоя команда</label>
+      <label for="team">Твоя команда <span style="font-weight:400;color:var(--muted)">(за бажанням)</span></label>
       <!-- TODO: cascading mapping юніт → команда зробимо пізніше -->
-      <input id="team" type="text" placeholder="Назва твоєї команди" required>
+      <input id="team" type="text" placeholder="Назва твоєї команди">
     </div>
 
     <div id="services"></div>
@@ -376,13 +376,13 @@
     </div>
 
     <div class="comment">
-      <label for="open">Що найбільше бісить — і чому? Чого бракує?</label>
-      <p class="hint">Необов'язково. Сюди — те, що не вліземо в цифри.</p>
-      <textarea id="open" placeholder="Напиши вільно…"></textarea>
+      <label for="open">Що відверто дратує у процесах і чого не вистачає?</label>
+      <p class="hint">Якщо є щось, про що не запитали вище — напиши тут.</p>
+      <textarea id="open" placeholder="Наприклад: бісить довге узгодження або незручний інтерфейс…"></textarea>
     </div>
 
     <div class="err" id="err"></div>
-    <button type="submit" class="submit">Готово</button>
+    <button type="submit" class="submit">Надіслати фідбек</button>
   </form>
 
   <div class="summary" id="summary">
@@ -406,28 +406,28 @@ const ENDPOINT = "https://script.google.com/macros/s/AKfycbyYxkvpBPLstz8L-4XFhi5
 /* ====== Сервіси для оцінки. Наповнювати = дописати об'єкти. ====== */
 const SERVICES = [
   // HR
-  { id:"onboarding",     name:"Онбординг співробітника",          desc:"Перші тижні, адаптація, buddy-підтримка, занурення в процеси", owner:"HR" },
-  { id:"career", kind:"функція",         name:"Кар'єрне зростання та розвиток",    desc:"Кар'єрний трек, грейди та очікування до ролі",            owner:"HR" },
-  { id:"performance",    name:"Performance review",               desc:"Цикл збору фідбеку та оцінки результативності",           owner:"HR" },
-  { id:"offboarding",    name:"Offboarding співробітника",        desc:"Вихід із компанії, передача справ, завершення співпраці",  owner:"HR" },
-  { id:"people_partner", kind:"функція", name:"People partnership",               desc:"Підтримка менеджерів і команд у піпл-кейсах",             owner:"HR" },
-  { id:"enps",           name:"eNPS",                             desc:"Регулярне опитування залученості та аналіз результатів",  owner:"HR" },
-  { id:"lnd", kind:"функція",            name:"L&D для менеджерів",                desc:"Навчання, програми розвитку та підтримка менеджерської ролі", owner:"HR" },
+  { id:"onboarding",     name:"Онбординг нового співробітника",     desc:"Від pre-boarding до завершення випробувального періоду: buddy-підтримка, онбординг-зустрічі, адаптація та регулярні чекпоінти", owner:"HR" },
+  { id:"career",         name:"Кар'єрна розмова з HR Partner",      desc:"За запитом або після Performance Review: обговорюємо кар'єрний трек, наступний крок і виходимо на конкретний інструмент — PDP, PIP або інші домовленості щодо руху", owner:"HR" },
+  { id:"performance",    name:"Performance Review",                 desc:"Цикл оцінки результатів і фідбеку: self review, peer review, manager review та підсумкова review-зустріч", owner:"HR" },
+  { id:"offboarding",    name:"Офбординг співробітника",            desc:"Супровід завершення співпраці: Exit Request, exit interview, деактивація доступів та закриття організаційних питань", owner:"HR" },
+  { id:"people_partner", name:"Опрацювання піпл-кейсу з HR Partner", desc:"Підключення HR у ситуаціях, що стосуються людини або команди: спільний аналіз контексту, рішення та план дій", owner:"HR" },
+  { id:"enps",           name:"eNPS",                               desc:"Регулярне опитування залученості: збір фідбеку, аналіз результатів і комунікація ключових висновків команді", owner:"HR" },
+  { id:"lnd",            name:"Навчання та розвиток через L&D",      desc:"Від визначення потреби до участі у форматі: навчальний трек, воркшоп, лекція, менторство або інший формат розвитку за результатами PR чи запитом менеджера / C-level", owner:"HR" },
 
   // Talent Acquisition
   { id:"ta_hire",    name:"Найм співробітника", desc:"Від відкриття вакансії до виходу кандидата", owner:"Talent Acquisition" },
   { id:"ta_payment", name:"Оплата контрактору", desc:"Від тікета на оплату до виплати",           owner:"Talent Acquisition" },
 
   // Admin
-  { id:"admin_clevel", kind:"функція",   name:"Адміністративна підтримка C-level", desc:"Організаційні запити, особисті доручення, координація для керівників", owner:"Admin" },
-  { id:"travel",         name:"Організація відряджень",           desc:"Логістика та фінансовий супровід поїздок", infra:"Відрядження організовуються відповідно до політики",                owner:"Admin" },
+  { id:"travel",       name:"Організація відряджень",              desc:"Супровід робочих поїздок: логістика, фінансовий супровід та координація деталей", owner:"Admin" },
+  { id:"admin_gifts",  name:"Організація подарунків партнерам",     desc:"Підбір, узгодження та організація вручення подарунку під конкретний привід (для C-level і бекофісу)", owner:"Admin" },
+  { id:"admin_auto",   name:"Організація обслуговування авто",      desc:"Супровід сервісних запитів щодо авто: мийка, заправка, ТО та інші операційні потреби (для C-level і бекофісу)", owner:"Admin" },
 
   // Compliance
-  { id:"comp_creatives", name:"Перевірка креативів",              desc:"Відповідність креативів вимогам комплаєнсу",              owner:"Compliance" },
-  { id:"comp_texts",     name:"Перевірка текстів",                desc:"Ризики та відповідність текстів вимогам комплаєнсу",       owner:"Compliance" },
-  { id:"comp_adaccounts",name:"Розблокування рекламних кабінетів",  desc:"Верифікація та розблокування кабінетів і платформ",       owner:"Compliance" },
-  { id:"comp_reputation",name:"Репутаційні ризики",               desc:"Оцінки, відгуки, SERM",                                   owner:"Compliance" },
-  { id:"comp_stores",    name:"Вимоги сторів і платформ",          desc:"Запити щодо вимог сторів та рекламних платформ",          owner:"Compliance" },
+  { id:"comp_review",  name:"Перевірка рекламних матеріалів перед запуском", desc:"Перевірка креативів, текстів та концептів на відповідність вимогам полісі TikTok, Meta, Google Ads перед використанням у рекламі", owner:"Compliance" },
+  { id:"comp_rejects", name:"Обробка реджектів рекламних оголошень",         desc:"Аналіз причини відхилення та подальша дія — апіл через кабінет, тікет у сапорт або комунікація з менеджером платформи (TikTok, Meta, Google Ads)", owner:"Compliance" },
+  { id:"comp_verify",  name:"Розблокування або верифікація рекламного кабінету/сторінки", desc:"Проходження бізнес-, платіжних та ідентифікаційних верифікацій, розблокування заблокованих кабінетів/сторінок", owner:"Compliance" },
+  { id:"comp_stores",  name:"Рекомендації щодо екранів застосунку в App Store / Google Play", desc:"Перевірка скріншотів, пейволів та інших екранів на відповідність вимогам сторів за запитом команди", owner:"Compliance" },
 
   // Employer Brand
   { id:"eb_ext_events",  name:"Організація зовнішніх івентів",                  desc:"Виступи спікером, ярмарки вакансій, нетворкінг — підготовка, бриф, координація", owner:"Employer Brand" },
@@ -448,10 +448,9 @@ const SERVICES = [
   { id:"fin_invoices",   name:"Оплата інвойсів",                  desc:"Оплата рахунків по послугах і сервісах",                   owner:"Finance" },
 
   // Legal
-  { id:"legal_contracts",name:"Договори",                         desc:"Вичитка, погодження, підписання (маркетингові, інтра-груп, послуги, NDA, SaaS)", owner:"Legal" },
-  { id:"legal_adhoc",    name:"Ad hoc юридичні запити",            desc:"Запити від продуктових і бек-офіс команд",                owner:"Legal" },
-  { id:"legal_compliance",name:"Комплаєнс-рев'ю продуктів",        desc:"Рев'ю екранів, funnels, first look, AI, data protection, online safety", owner:"Legal" },
-  { id:"legal_hr",       name:"Договори зі співробітниками",        desc:"Договори й довідки для співробітників і фрілансерів (шаблони PandaDoc)", owner:"Legal" },
+  { id:"legal_partners",  name:"Юридичне оформлення співпраці з партнерами", desc:"Аналіз запропонованих умов, узгодження вигідних для компанії позицій (ціна, відповідальність, IP, дані) та фіналізація договору — від запиту на співпрацю до підписання (маркетингові угоди, інтра-груп угоди, договори послуг, NDA, SaaS)", owner:"Legal" },
+  { id:"legal_risk",      name:"Юридична оцінка ризику ініціативи чи питання", desc:"Аналіз ризиків і рекомендація, коли виникає сумнів щодо законності чи ризикованості дії, формулювання чи ініціативи — від звернення з сумнівом до висновку (можна / не можна / можна за умов)", owner:"Legal" },
+  { id:"legal_compliance",name:"Комплаєнс-рев'ю продукту та робота з ризиками", desc:"Ініціатива юриста перевірити продукт/фічу на комплаєнс-ризики, підготувати план рекомендацій і довести його до виконання разом з продуктовою командою", owner:"Legal" },
 
   // Operations
   { id:"ops_subs",  name:"Отримання доступу до підписки",              desc:"Від запиту до видачі доступу або купівлі підписки",      owner:"Operations" },
@@ -492,7 +491,7 @@ const cardHTML = (s) => `
     ${scaleHTML(s.id,"value", VALUE_Q,  VALUE_A,  "Користь")}
     ${scaleHTML(s.id,"burden",BURDEN_Q, BURDEN_A, "Складність")}
     <label class="na"><input type="checkbox" id="na-${s.id}"> Не користуюсь цим процесом</label>
-    <input type="text" class="scomment" id="sc-${s.id}" placeholder="Коментар (необов'язково)">
+    <input type="text" class="scomment" id="sc-${s.id}" placeholder="Тут можна додати деталей">
   </div>`;
 
 const groupOrder = [];
@@ -528,7 +527,7 @@ const customHTML = (cid) => `
     <input type="text" class="cname" id="cname-${cid}" placeholder="Назва свого процесу">
     ${scaleHTML("c"+cid,"value", VALUE_Q,  VALUE_A,  "Користь")}
     ${scaleHTML("c"+cid,"burden",BURDEN_Q, BURDEN_A, "Складність")}
-    <input type="text" class="scomment" id="ccomment-${cid}" placeholder="Коментар (необов'язково)">
+    <input type="text" class="scomment" id="ccomment-${cid}" placeholder="Тут можна додати деталей">
   </div>`;
 function addCustomBlock(focus){
   const cid = ++customSeq;
@@ -586,7 +585,6 @@ form.addEventListener("submit", e => {
 
   if (!role) { showErr("Спочатку обери, хто ти."); return; }
   if (!unit) { showErr("Обери юніт."); return; }
-  if (!team) { showErr("Впиши свою команду."); return; }
   if (missing.length) {
     showErr("Залиш обидві оцінки або познач «не користуюсь» для: " + missing.join(", ") + ".");
     return;
@@ -613,7 +611,7 @@ function renderSummary(role, unit, team, answers, comment, custom){
     + "-" + Math.random().toString(36).slice(2,6);
   const payload = { submission_id, role, unit, team, answers, custom, comment, ts:new Date().toISOString() };
 
-  document.getElementById("sumMeta").textContent = role + " · " + unit + " · " + team;
+  document.getElementById("sumMeta").textContent = [role, unit, team].filter(Boolean).join(" · ");
 
   const rowHTML = (name, scores, cmt) =>
     `<div class="row"><span class="rn">${name}</span><span class="scores">${scores}</span></div>` +
